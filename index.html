@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Mogul</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="screen-menu" class="screen active">
+    <div class="menu-bg-glow"></div>
+    <div class="menu-container">
+        <div class="menu-logo">
+            <span class="logo-casino">CASINO</span>
+            <span class="logo-mogul">MOGUL</span>
+        </div>
+        <p class="menu-subtitle">Las Vegas-i rablás</p>
+        <div class="menu-buttons">
+            <button id="btn-new-game" class="btn btn-primary">🎰 Új játék</button>
+            <button id="btn-load-game" class="btn btn-secondary">📂 Folytatás</button>
+            <button id="btn-settings" class="btn btn-secondary">⚙️ Beállítások</button>
+            <button id="btn-help" class="btn btn-secondary">❓ Súgó</button>
+        </div>
+        <div class="menu-footer">
+            <span id="neptun-code">Készítette: Németh Gergő  KGZ04K</span>
+        </div>
+    </div>
+</div>
+
+
+<div id="screen-game" class="screen">
+
+    <!-- HUD -->
+    <div id="hud">
+        <div id="hud-players">
+            <div class="hud-player" id="hud-p1">
+                <span class="player-label p1-color">🔴 Player 1</span>
+                <span class="player-money">💰 <span id="p1-money">20</span></span>
+                <span class="player-kills">💀 <span id="p1-kills">0</span></span>
+            </div>
+            <div class="hud-player" id="hud-p2">
+                <span class="player-label p2-color">🔵 Player 2</span>
+                <span class="player-money">💰 <span id="p2-money">20</span></span>
+                <span class="player-kills">💀 <span id="p2-kills">0</span></span>
+            </div>
+        </div>
+        <div class="hud-center">
+            <div class="round-info">Kör: <span id="current-round">1</span> / 5</div>
+            <div class="timer-box"><span id="timer-display">60</span><span class="timer-label">mp</span></div>
+            <div class="active-player-label">Aktív: <span id="active-player-name">Player 1</span></div>
+        </div>
+    </div>
+
+    <!-- Játéktér -->
+    <div id="game-area">
+        <canvas id="game-canvas" width="640" height="640"></canvas>
+
+        <!-- JOBB OLDAL: 2 oszlopos panel -->
+        <div id="side-panel">
+
+            <!-- BAL OSZLOP: info + műveletek -->
+            <div id="side-left">
+
+                <!-- Egység info panel -->
+                <div class="panel-section" id="unit-info-panel">
+                    <h3 class="panel-title">Kijelölt egység</h3>
+                    <div id="unit-info-content">
+                        <p class="panel-empty">Kattints egy egységre<br>vagy casino épületre!</p>
+                    </div>
+                </div>
+
+                <!-- Casino panel -->
+                <div class="panel-section" id="building-panel" style="display:none">
+                    <h3 class="panel-title">🎰 Casino</h3>
+                    <div id="building-info-content"></div>
+                </div>
+
+                <!-- Műveletek -->
+                <div class="panel-section" id="action-panel">
+                    <h3 class="panel-title">Műveletek</h3>
+                    <button id="btn-build-casino" class="btn btn-action" disabled>
+                        🎰 Casino építés (20💰)
+                    </button>
+                    <button id="btn-end-turn" class="btn btn-primary">
+                        ⏭️ Kör vége
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- JOBB OSZLOP: súgó felül, napló alul -->
+            <div id="side-right">
+
+                <div class="panel-section" id="quick-help-panel">
+                    <h3 class="panel-title">Gyors súgó</h3>
+                    <div class="quick-help-content">
+                        <p>🖱️ <b>Kattints</b> saját egységre kijelölés</p>
+                        <p>🖱️ <b>Kattints</b> szomszéd mezőre lépés</p>
+                        <p>🎰 <b>Kattints</b> casinóra gyártás</p>
+                        <p>⌨️ <b>Enter</b> → kör vége</p>
+                        <p>⌨️ <b>H</b> → részletes súgó</p>
+                        <p>⌨️ <b>Esc</b> → kijelölés törlése</p>
+                        <p>⌨️ <b>S</b> → gyors mentés</p>
+                        <hr class="help-divider">
+                        <p class="unit-quick-ref">💵 Kasszás 2x pénzt gyűjt</p>
+                        <p class="unit-quick-ref">👊 Bouncer erős harcos</p>
+                        <p class="unit-quick-ref">🕵️ Besúgó gyors mozgás</p>
+                    </div>
+                </div>
+
+                <div class="panel-section" id="log-panel">
+                    <h3 class="panel-title">Napló</h3>
+                    <div id="log-content"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Alsó sáv -->
+    <div id="bottom-bar">
+        <button id="btn-save" class="btn btn-small">💾 Mentés</button>
+        <button id="btn-game-help" class="btn btn-small">❓ Súgó [H]</button>
+        <button id="btn-game-settings" class="btn btn-small">⚙️ Beállítások</button>
+        <button id="btn-menu" class="btn btn-small btn-danger">🚪 Főmenü</button>
+        <span class="neptun-corner">KGZ04K</span>
+    </div>
+</div>
+
+<!--JÁTÉK VÉGE-->
+<div id="screen-gameover" class="screen">
+    <div class="gameover-container">
+        <div id="gameover-title" class="gameover-title">🏆 Győzelem!</div>
+        <div id="gameover-winner" class="gameover-winner"></div>
+        <div id="gameover-stats" class="gameover-stats"></div>
+        <div class="gameover-buttons">
+            <button id="btn-play-again" class="btn btn-primary">🔄 Új játék</button>
+            <button id="btn-back-menu" class="btn btn-secondary">🏠 Főmenü</button>
+        </div>
+    </div>
+</div>
+
+<!--BEÁLLÍTÁSOK MODAL-->
+<div id="modal-settings" class="modal hidden">
+    <div class="modal-box">
+        <h2 class="modal-title">⚙️ Beállítások</h2>
+        <div class="setting-row">
+            <label>Kör időlimit</label>
+            <div class="setting-options">
+                <button class="btn-option" data-setting="turnTimeLimit" data-value="30">30 mp</button>
+                <button class="btn-option active" data-setting="turnTimeLimit" data-value="60">60 mp</button>
+                <button class="btn-option" data-setting="turnTimeLimit" data-value="90">90 mp</button>
+            </div>
+        </div>
+        <div class="setting-row">
+            <label>Téma</label>
+            <div class="setting-options">
+                <button class="btn-option" data-setting="theme" data-value="day">☀️ Nappali</button>
+                <button class="btn-option active" data-setting="theme" data-value="night">🌙 Éjszakai</button>
+            </div>
+        </div>
+        <div class="setting-row">
+            <label>Hang</label>
+            <div class="setting-options">
+                <button class="btn-option active" data-setting="soundEnabled" data-value="true">🔊 Be</button>
+                <button class="btn-option" data-setting="soundEnabled" data-value="false">🔇 Ki</button>
+            </div>
+        </div>
+        <button id="btn-close-settings" class="btn btn-primary modal-close">✓ Bezárás</button>
+    </div>
+</div>
+
+<!--SÚGÓ MODAL -->
+<div id="modal-help" class="modal hidden">
+    <div class="modal-box modal-box-wide">
+        <h2 class="modal-title">❓ Súgó</h2>
+        <div class="help-section">
+            <h3>🎯 Cél</h3>
+            <p>5 kör alatt gyűjts több pénzt mint az ellenfél! Egyenlő pénz esetén a több ölés dönt.</p>
+        </div>
+        <div class="help-section">
+            <h3>👥 Egységek</h3>
+            <table class="help-table">
+                <tr>
+                    <th>Egység</th>
+                    <th>HP</th>
+                    <th>Mozgás</th>
+                    <th>Támadás</th>
+                    <th>Gyártás</th>
+                    <th>Különlegesség</th>
+                </tr>
+                <tr>
+                    <td>💵 Kasszás</td>
+                    <td>3</td>
+                    <td>4 mező</td>
+                    <td>1</td>
+                    <td>10💰</td>
+                    <td>2x pénzt gyűjt</td>
+                </tr>
+                <tr>
+                    <td>👊 Bouncer</td>
+                    <td>5</td>
+                    <td>3 mező</td>
+                    <td>3</td>
+                    <td>20💰</td>
+                    <td>Erős támadás</td>
+                </tr>
+                <tr>
+                    <td>🕵️ Besúgó</td>
+                    <td>2</td>
+                    <td>5 mező</td>
+                    <td>1</td>
+                    <td>12💰</td>
+                    <td>Nagy látótávolság</td>
+                </tr>
+            </table>
+        </div>
+        <div class="help-section">
+            <h3>🏗️ Építkezés és gyártás</h3>
+            <p>Ha van 20💰 pénzed, a "Casino építés" gombbal lerakhatod a casinót egy szabad mezőre. A casino körönként
+                5💰 bevételt termel. Kattints egy saját casinóra az egységgyártás megnyitásához!</p>
+        </div>
+        <div class="help-section">
+            <h3>⌨️ Billentyűk</h3>
+            <table class="help-table">
+                <tr>
+                    <td><kbd>Enter</kbd></td>
+                    <td>Kör vége</td>
+                </tr>
+                <tr>
+                    <td><kbd>H</kbd></td>
+                    <td>Súgó megnyitása/bezárása</td>
+                </tr>
+                <tr>
+                    <td><kbd>Esc</kbd></td>
+                    <td>Kijelölés törlése / Építési mód kilépés</td>
+                </tr>
+                <tr>
+                    <td><kbd>S</kbd></td>
+                    <td>Gyors mentés</td>
+                </tr>
+            </table>
+        </div>
+        <div class="help-section">
+            <h3>🎮 Egy kör menete</h3>
+            <ol>
+                <li>Kattints egy saját egységre (kijelölődik, zöld mezők = elérhető)</li>
+                <li>Kattints egy elérhető mezőre a mozgáshoz</li>
+                <li>Ha ellenség van ott akkor a harc automatikusan zajlik</li>
+                <li>Ha pénz van ott akkor begyűjtöd</li>
+                <li>Kattints saját casinódra és egységet gyárthatsz</li>
+                <li>"Kör vége" gomb vagy idő lejárta akkor a következő játékos</li>
+            </ol>
+        </div>
+        <button id="btn-close-help" class="btn btn-primary modal-close">✓ Bezárás</button>
+    </div>
+</div>
+
+
+<div id="modal-newgame" class="modal hidden">
+    <div class="modal-box">
+        <h2 class="modal-title">🎰 Új játék</h2>
+        <div class="setting-row">
+            <label>Player 1 neve</label>
+            <input type="text" id="input-p1-name" class="text-input" placeholder="Player 1" maxlength="16">
+        </div>
+        <div class="setting-row">
+            <label>Player 2 neve</label>
+            <input type="text" id="input-p2-name" class="text-input" placeholder="Player 2" maxlength="16">
+        </div>
+        <button id="btn-start-game" class="btn btn-primary">🎲 Játék indítása!</button>
+        <button id="btn-cancel-newgame" class="btn btn-secondary">Vissza</button>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/save.js"></script>
+<script src="js/map.js"></script>
+<script src="js/units.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
