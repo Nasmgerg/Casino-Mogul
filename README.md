@@ -94,9 +94,9 @@ A projekt statikus front-end alkalmazás, szerver nélkül futtatható:
 ## Képernyőképek
 
 <!-- Ide kerülnek a menü és a játék screenshotjai -->
-![Főmenü](assets/screenshots/menu.png)
-![Játéktér](assets/screenshots/gameplay.png)
-![Játéktér](assets/screenshots/gameplay2.png)
+![Főmenü](assets/images/scremenu.png)
+![Játéktér](assets/images/gameplay.png)
+![Játéktér](assets/images/gameplay2.png)
 
 ---
 
