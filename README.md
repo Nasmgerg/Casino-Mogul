@@ -100,4 +100,4 @@ A projekt statikus front-end alkalmazás, szerver nélkül futtatható:
 
 ---
 
-**Készítette:** Németh Gergő  Neptun kód: **KGZ04K**
+
